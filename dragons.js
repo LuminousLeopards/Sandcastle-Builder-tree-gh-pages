@@ -439,7 +439,7 @@ Molpy.DragonDigRecalc = function() {
 
 	Molpy.DragonDigMultiplier = 10;
 	if (Molpy.Got('Bucket and Spade')) Molpy.DragonDigMultiplier *=2;
-	if (Molpy.Has('Knights\' Blood',2 + Molpy.Boosts['Knights\' Blood'].power)) Molpy.DragonDigMultiplier *= (2+Molpy.Boosts['Knights\' Blood'].power);
+	if (Molpy.Has('Strength Potion',2 + Molpy.Boosts['Strength Potion'].power)) Molpy.DragonDigMultiplier *= (2+Molpy.Boosts['Strength Potion'].power);
 	if (Molpy.Got('Golden Bull')) Molpy.DragonDigMultiplier *=5;
 
 	Molpy.DragonDefenceMultiplier = 1;
@@ -945,7 +945,7 @@ Molpy.OpponentsAttack = function(where,df,text1,text2,fighttype,breathtype) {
 			Molpy.Notify(atktxt + '<br>Exhausted from the battle, your dragons cede their territory to the Redundaknights. The  will need to recover for ' + rectime + '.',1);
 			dq.Loose(npd.DragonType,npd.amount);
 			npd.amount = 0;
-			if(Molpy.Got('Cryogenics') Molpy.Boosts('Cryogenics').power += npd.amount;
+			if(Molpy.Got('Cryogenics')) Molpy.Boosts('Cryogenics').power += npd.amount;
 			Molpy.Add('exp',Math.max(local.experience()*df.numb, Math.pow(10,npd.DragonType)/5));
 			Molpy.Overview.Update(where);
 			break;
@@ -960,7 +960,7 @@ Molpy.OpponentsAttack = function(where,df,text1,text2,fighttype,breathtype) {
 			Molpy.Redacted.toggle = 2 + Molpy.Redacted.countup;
 			dq.Loose(npd.DragonType,npd.amount);
 			npd.amount = 0;
-			if(Molpy.Got('Cryogenics') Molpy.Boosts('Cryogenics').power += npd.amount;
+			if(Molpy.Got('Cryogenics')) Molpy.Boosts('Cryogenics').power += npd.amount;
 			Molpy.Overview.Update(where);
 			break;
 
