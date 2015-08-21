@@ -26,7 +26,6 @@ Molpy.Constants = { // Rank 0:simple, 1:harder, 2:10+, 3:complex
 Molpy.DragonsById = [];
 Molpy.Dragons = {};
 Molpy.DragonN = 0;
-Molpy.DragonStuffStats = [];
 	
 Molpy.Dragon = function(args) {
 	this.id = Molpy.DragonN++;
@@ -110,7 +109,7 @@ Molpy.DefineDragons = function() {
 		upgrade: {Diamonds:'1T'},
 		exp: '80Z',
 		condition: function() { return false },
-		desc: 'These can fly.  They fight and dig with their legs, some have a bad breath.',
+		desc: 'These can fly.  They fight and dig with their legs, some have bad breath.',
 		digbase: 1e6,
 		defbase: 1e8,
 		breathbase: 1,
@@ -394,11 +393,28 @@ Molpy.DefineOpponents = function() {
 
 // NPdata **********************************************************
 
-Molpy.NPdata = [];
+Molpy.NPdata = {};
 
 Molpy.ClearNPdata = function() {
-	Molpy.NPdata = [];
+	Molpy.NPdata = {};
 };
+Molpy.NextLegalNP=function(at){
+	if(Molpy.fracParts.indexOf(Number((at-Math.floor(at)).toFixed(3)))==-1){
+		at=Math.floor(at)+1
+	} else{
+		at=Math.floor(at)+Molpy.fracParts[Molpy.fracParts.indexOf(Number((at-Math.floor(at)).toFixed(3)))+1]
+	}
+	return at
+}
+Molpy.NPRange = function(start,end){ // weird placement, but needed for the next one
+	var at=start;
+	var ans=[];
+	while(at<=end){
+		ans.push(at)
+		at=Molpy.NextLegalNP(at)
+	}
+	return ans
+}
 
 // Digging *********************************************************
 
@@ -455,6 +471,8 @@ Molpy.DragonDigRecalc = function() {
 	if (Molpy.Has('Cup of Tea',2 + Molpy.Boosts['Cup of Tea'].power)) Molpy.DragonLuck += .0005*(1+Molpy.Boosts['Cup of Tea'].power);
 
 	if (Molpy.Got('Chintzy Tiara')) Molpy.HideMod += 22;
+
+	Molpy.DragonBreathMultiplier = 1;
 
 	var td = 0;
 	Molpy.TotalNPsWithDragons = 0;
@@ -588,16 +606,15 @@ Molpy.DragonDigging = function(type) { // type:0 = mnp, 1= beach click
 		Molpy.Spend('Vacuum','400HW');
 	} else if(Molpy.Got('Ventus Vehemens') && Molpy.IsEnabled('Ventus Vehemens')) {
 		Molpy.Notify("Ran out of Vacuum!",1);
-		Molpy.GenericToggle(Molpy.Boosts['Ventus Vehemens'].id,1);
+		Molpy.Boosts['Ventus Vehemens'].power = 0;
 	}
-	Molpy.Boosts['Dragon Breath'].breathRecovery--;
 }
 
-Molpy.FindThings = function() { 
+Molpy.FindThings = function() {
 	var dqlevel = Molpy.Level('DQ');
 	var availRewards = [];
-	for( var i in Molpy.Boosts) {
-		var me = Molpy.Boosts[i];
+	for( var i=0;i<Molpy.DragonRewardOptions.length;i++) {
+		var me = Molpy.Boosts[Molpy.DragonRewardOptions[i]];
 		if("draglvl" in me && Molpy.Dragons[me.draglvl].id <= dqlevel) {
 			var lim = EvalMaybeFunction((me.limit || 1),me);      
 			if (me.unlocked < lim && me.unlocked == me.bought) availRewards.push(me);
@@ -621,6 +638,10 @@ Molpy.MaxDragons = function() {
 } 
 
 Molpy.DragonFledge = function(clutch) {
+	if (Molpy.newpixNumber == 0) {
+		Molpy.Notify('Time balks.');
+		return;
+	}
 	var npd = Molpy.NPdata[Molpy.newpixNumber];
 	var dq = Molpy.Boosts['DQ'];
 	var hatch = Molpy.Boosts['Hatchlings'];
@@ -643,7 +664,6 @@ Molpy.DragonFledge = function(clutch) {
 				dq.overallState = 0;
 				Molpy.Notify('Back to work! The dragons have resumed digging',1);
 			};
-
 		} else {
 			Molpy.Notify('This NP already has better dragons, who have eaten the interlopers',1);
 			hatch.clutches[clutch] = 0;
@@ -743,13 +763,13 @@ Molpy.DragonStatsNow = function(where) {
 
 Molpy.FindOpponents = function(from) {
 	var df = {};
-	df.from = from;
-	df.type = Math.min(Math.floor(from/150),Molpy.OpponentsById.length-1);
+	df.from = Math.floor(from);
+	df.type = Math.min(Math.floor(from/150)+1+Molpy.fracParts.indexOf(Number((from-Math.floor(from)).toFixed(3))),Molpy.OpponentsById.length-1);
 	df.numb = (Molpy.TotalDragons < 10 && Molpy.HighestNPwithDragons < 20)?1:Math.floor(((from-df.type*150)/30)*(Math.random())+1);
 	df.gender = 1*(Math.random() < 0.5);
 	df.modifier = Math.random()+.5;
 	return df;
-}
+} //Not great, whatever.
 
 Molpy.CombatDebug = 0;
 Molpy.OpponentsAttack = function(where,df,text1,text2,fighttype,breathtype) {
@@ -1000,7 +1020,7 @@ Molpy.RedundaKnight = function() {
 	if (Math.random()<.25) {
 		var di = Math.random()*Molpy.TotalNPsWithDragons;
 		var found = 0;
-		for (var np=1; np<=atk; np++) {
+		for (var np=1; np<=atk; np=Molpy.NextLegalNP(np)) {
 			if (Molpy.NPdata[np] && Molpy.NPdata[np].amount) {
 				found++;
 				if (found >= di) {
@@ -1018,17 +1038,12 @@ Molpy.RedundaKnight = function() {
 	opp.knowledge = [];
 	var know = [0, 1, 2, 3];
 	for(var i in know){
-		switch(fly > 16){
-			case true:
-				opp.knowledge[0] = opp.knowledge[1] = opp.knowledge[2] = opp.knowledge[3] = 1;
-				var roll = Math.random();
-				if(roll + Molpy.DragonLuck > .5) opp.knowledge[4] = 1;
-				if(roll + Molpy.DragonLuck > .75) opp.knowledge[5] = 1;
-				break;
-			case false:
-				opp.knowledge[i] = fly > 4*i && 11*(fly/(i + 1 || 1)) >=Math.random()*100 - 77*Molpy.DragonLuck;
-				break;
-		}
+		if(fly > 16){
+			opp.knowledge[0] = opp.knowledge[1] = opp.knowledge[2] = opp.knowledge[3] = 1;
+			var roll = Math.random();
+			if(roll + Molpy.DragonLuck > .5) opp.knowledge[4] = 1;
+			if(roll + Molpy.DragonLuck > .75) opp.knowledge[5] = 1;
+		} else opp.knowledge[i] = fly > 4*i && 11*(fly/(i + 1 || 1)) >=Math.random()*100 - 77*Molpy.DragonLuck;
 	};
 	opp.target = atk;
 	return opp;
@@ -1058,8 +1073,7 @@ Molpy.DragonUpgrade = function(type) {
 	var str = '';
 	var dragn = Molpy.DragonsById[dq.Level];
 	if (type == 0) {
-		if (!dragn.condition()) return;
-
+		if (!dragn.condition()) return str;
 		if (Molpy.Level('exp') >= DeMolpify(dragn.exp)) {
 			if (Molpy.Has(dragn.upgrade)) {
 				str += '<br><br><input type=button value=Upgrade onclick="Molpy.DragonUpgrade(1)"></input> ';
@@ -1079,7 +1093,6 @@ Molpy.DragonUpgrade = function(type) {
 		Molpy.Boosts['DQ'].Refresh();
 		if (Molpy.Got('Dragon Overview')) Molpy.Overview.Create();
 		Molpy.Notify('Hatchlings now mature into '+ Molpy.DragonsById[dq.Level].name,1) + 's';
-		if (dq.Level >= 2) Molpy.UnlockBoost('The Phylactery');
 		if (dq.Level >= 3){
 			Molpy.UnlockBoost('WotT');
 			Molpy.UnlockBoost('WotP');
@@ -1101,6 +1114,10 @@ Molpy.DragonsToCryo = function(cl) {
 }
 
 Molpy.DragonsFromCryo = function() { // Cut down version of fledge
+	if (Molpy.newpixNumber == 0) {
+		Molpy.Notify('Time balks.');
+		return;
+	}
 	var npd = Molpy.NPdata[Molpy.newpixNumber];
 	var dq = Molpy.Boosts['DQ'];
 	var lim = Molpy.MaxDragons();
@@ -1174,18 +1191,8 @@ Molpy.Breath = function(index,np){
 		txt += '<input type=button value=">" onclick="Molpy.changeBreath(' + effects + ')"</input>'
 	};
 	Molpy.redactedNeedRepaint = 1;
-	Molpy.DragonDigRecalcNeeded = 1;
 	return txt;
 }
-
-Molpy.changeBreath = function(effects){
-	var elements = effects.length;
-	var index = Molpy.Boosts['Dragon Breath'].power;
-	var newindex = iterify(elements,index);
-	Molpy.Boosts['Dragon Breath'].power = newindex - 1;
-	Molpy.Breath(newindex,np);
-}
-
 
 /* Ideas
  * Lets try science

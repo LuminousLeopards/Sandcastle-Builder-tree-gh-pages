@@ -507,46 +507,6 @@ body.lightscheme .badge.loot h1
 	text-align:center;
 	font-size:28px;
 }
-.notifred
-{
-	font-family:'Conv_xkcd-Regular',Sans-Serif;
-	position:absolute;
-	pointer-events:none;
-	left:-200px;
-	bottom:0px;
-	width:600px;
-	z-index:100000000;
-	text-align:center;
-	font-size:28px;
-	color: red;
-}
-.notifice
-{
-	font-family:'Conv_xkcd-Regular',Sans-Serif;
-	position:absolute;
-	pointer-events:none;
-	left:-200px;
-	bottom:0px;
-	width:600px;
-	z-index:100000000;
-	text-align:center;
-	font-size:28px;
-	color: #00BFFF;
-}
-.notifice
-{
-	font-family:'Conv_xkcd-Regular',Sans-Serif;
-	position:absolute;
-	pointer-events:none;
-	left:-200px;
-	bottom:0px;
-	width:600px;
-	z-index:100000000;
-	text-align:center;
-	font-size:28px;
-	color: green;
-}
-
 .icon
 {
 	float:right;
@@ -806,4 +766,8 @@ body.darkscheme #doverhover {
 	height:24px;
 	padding:2px;
 	margin;2px;
+}
+#sectionOptions {
+	height: 236px; 
+	overflow-y: scroll;
 }
