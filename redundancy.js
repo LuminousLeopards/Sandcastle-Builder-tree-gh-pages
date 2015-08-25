@@ -111,6 +111,10 @@ function randbool() {
 function GLRschoice(things) {
 	return things[flandom(things.length)];
 }
+function iterify(length,index){
+	index<length?index++:index = 0;
+	return index;
+}
 function EvalMaybeFunction(bacon, babies, ice) {
 	var B = typeof (bacon);
 	var D = 'function';

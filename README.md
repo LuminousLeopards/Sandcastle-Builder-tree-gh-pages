@@ -30,10 +30,9 @@ Inspired by Orteil's C**kie Clicker.
 
 For personal amusement only.
 
-
 ## Changelog
 
-### 3.7 Kitty Genocide Simulator 2015
+### 4.0 Kitty Genocide Simulator 2015
 
 #### erp-lsf
 - New Option:
@@ -103,9 +102,11 @@ For personal amusement only.
 - 8 new badges
 - 76 new discoveries (for t1i)
 
+#### LuminousLeopards
+
+
+
 ### 3.67 Enough Mustard for a Sandwich
-
-
 
 #### stormrunnerz
 
