@@ -1146,6 +1146,7 @@ Molpy.DefineGUI = function() {
 	Molpy.LogONG = function(){
 		Molpy.currentLog++;
 		Molpy.logArchive[Molpy.currentLog] = [];
+
 		Molpy.logArchive[Molpy.currentLog].np = Math.floor(Molpy.newpixNumber);
 		Molpy.logArchive[Molpy.currentLog].time = new Date();
 		Molpy.selectedLog = Molpy.currentLog;
