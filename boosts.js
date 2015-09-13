@@ -12045,10 +12045,13 @@ Molpy.Coallate = function(){
 			return str;
 		},
 		stats: function(me){
-			if(me.bought) var str = 'Fire breath does a large initial burst of damage and has a chance to continue burning enemies.<br>';
-			if(me.bought && Molpy.Boosts['DQ'].Level > 3) str += 'Ice breath reduces the enemy\'s attack strength and has a chance to freeze them for a turn.<br>';
-			if(me.bought && Molpy.Boosts['DQ'].Level > 4) str += 'Poison breath deals damage during the mNPs leading up to a fight and may wipe out an opponent in a close fight.<br>';
-			if(me.bought && Molpy.Boosts['DQ'].Level > 5) str += 'Special attacks vary.<br>';
+			var str = me.desc(me);
+			if(me.bought) {
+				str = 'Fire breath does a large initial burst of damage and has a chance to continue burning enemies.<br>';
+				if(Molpy.Boosts['DQ'].Level > 3) str += 'Ice breath reduces the enemy\'s attack strength and has a chance to freeze them for a turn.<br>';
+				if(Molpy.Boosts['DQ'].Level > 4) str += 'Poison breath deals damage during the mNPs leading up to a fight and may wipe out an opponent in a close fight.<br>';
+				if(Molpy.Boosts['DQ'].Level > 5) str += 'Special attacks vary.<br>';
+			}
 			return str;
 		},
 		group: 'drac',
